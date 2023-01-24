@@ -1,10 +1,15 @@
 const express = require('express');
 const cloudinary = require('cloudinary').v2;
+const { MongoClient } = require('mongodb');
 const Post = require('../mongoDB/models/post');
 
 require('dotenv').config();
 
 const router = express.Router();
+
+const client = new MongoClient(process.env.MONGODB_URL);
+const db = client.db(process.env.DB_NAME);
+const collection = db.collection('posts');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,10 +20,12 @@ cloudinary.config({
 // GET ALL POSTS
 router.route('/').get(async (req, res) => {
   try {
-    const posts = await Post.find({});
+    await client.connect();
+    const posts = await collection.find({}).toArray();
 
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ success: false, data: error });
   }
 });
@@ -29,13 +36,14 @@ router.route('/').post(async (req, res) => {
     const { name, prompt, photo } = req.body;
     const photoUrl = await cloudinary.uploader.upload(photo);
 
-    const newPost = new Post({
+    await client.connect();
+    const result = await collection.insertOne({
       name,
       prompt,
       photo: photoUrl.url,
     });
 
-    res.status(201).json({ success: true, data: newPost });
+    res.status(201).json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error });
   }

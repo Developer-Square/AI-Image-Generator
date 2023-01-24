@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const connect = require('./mongoDB/connect');
+const connectDB = require('./mongoDB/connect');
 const dalleRoutes = require('./routes/dalleRoutes');
 const postRoutes = require('./routes/postRoutes');
 
@@ -14,12 +14,12 @@ app.use('/api/v1/post', postRoutes);
 app.use('/api/v1/dalle', dalleRoutes);
 
 app.get('/', async (req, res) => {
-  res.send('Hola de DALL-E!');
+  res.send('Hola de DALL-E, Home!');
 });
 
 const startServer = async () => {
   try {
-    connect.connectDB(process.env.MONGODB_URL);
+    connectDB(process.env.MONGODB_URL);
     app.listen(8080, () =>
       console.log('Server running on http://localhost:8080')
     );
