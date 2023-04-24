@@ -1,0 +1,17 @@
+{
+    "apps": [
+      {
+        "name": "AI-Image-Generator",
+        "script": "dist/index.js",
+        "instances": 1,
+        "autorestart": true,
+        "watch": true,
+        "ignore_watch": ["node_modules"],
+        "time": true,
+        "env": {
+          "NODE_ENV": "production",
+          "PORT": 4003
+        }
+      }
+    ]
+}
