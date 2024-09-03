@@ -1,14 +1,13 @@
 const express = require('express');
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAi = require('openai');
 
 require('dotenv').config();
 
 const router = express.Router();
-const configuration = new Configuration({
+
+const openai = new OpenAi({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 router.route('/').get(async (req, res) => {
   res.send('Hola de DALL-E!');
@@ -18,14 +17,12 @@ router.route('/').post(async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    const aiResponse = await openai.createImage({
+    const response = await openai.images.generate({
+      model: 'dall-e-3',
       prompt,
-      n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json',
     });
 
-    const image = aiResponse.data.data[0].b64_json;
+    const image = response.data[0].url;
 
     res.status(200).json({ photo: image });
   } catch (error) {
